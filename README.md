@@ -9,7 +9,7 @@ ARCAEGIS is an autonomous risk-detection system that protects an onchain vault h
 
 Most "AI agent" projects let a language model act directly. ARCAEGIS deliberately does not.
 
-An AI reads live risk signals and returns a recommendation. A separate, fully deterministic **policy engine** — plain code, zero AI — decides whether anything actually happens onchain. The AI never touches the contract directly. If the underlying data can't be trusted (a stale oracle, for example), the system refuses to act at all, even if both the raw signals and the AI agree something is CRITICAL.
+An AI reads live risk signals and returns a recommendation. A separate, fully deterministic **policy engine** - plain code, zero AI - decides whether anything actually happens onchain. The AI never touches the contract directly. If the underlying data can't be trusted (a stale oracle, for example), the system refuses to act at all, even if both the raw signals and the AI agree something is CRITICAL.
 
 That's the whole architectural thesis: **you don't trust the AI, you trust the bounded system the AI operates inside.**
 
