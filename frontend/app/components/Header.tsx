@@ -17,7 +17,7 @@ export default function Header({ error }: { error: string | null }) {
           <p className="font-mono text-sm font-semibold tracking-wide" style={{ color: "var(--text-1)" }}>
             ARCAEGIS
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: "var(--text-3)" }}>
+          <p className="font-mono text-[12px] uppercase tracking-[0.2em]" style={{ color: "#CBD5E1" }}>
             X Layer Testnet
           </p>
         </div>

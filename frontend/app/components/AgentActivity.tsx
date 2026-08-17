@@ -62,7 +62,7 @@ export default function AgentActivity() {
   return (
     <div className="rounded-lg border mt-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
       <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
-        <span className="font-mono text-xs uppercase tracking-[0.2em]" style={{ color: "var(--text-3)" }}>
+        <span className="font-mono text-xs uppercase tracking-[0.2em]" style={{ color: "#CBD5E1" }}>
           Agent Activity
         </span>
         <button
@@ -81,7 +81,7 @@ export default function AgentActivity() {
 
       <div className="px-5 py-4 font-mono text-sm">
         {cycles.length === 0 && (
-          <p style={{ color: "var(--text-3)" }}>No cycles run yet. Click Run Cycle to trigger one.</p>
+          <p style={{ color: "#CBD5E1" }}>No cycles run yet. Click Run Cycle to trigger one.</p>
         )}
         <ul className="space-y-2">
           {cycles.map((c) => {
@@ -93,17 +93,17 @@ export default function AgentActivity() {
                   className="w-full flex gap-3 items-baseline px-3 py-2 text-left"
                   onClick={() => setExpandedId(isOpen ? null : c.id)}
                 >
-                  <span style={{ color: "var(--text-3)" }}>{timeLabel(c.timestamp)}</span>
+                  <span style={{ color: "#CBD5E1" }}>{timeLabel(c.timestamp)}</span>
                   <span style={{ color }}>{c.action}</span>
                   <span style={{ color: "var(--text-2)" }}>
                     {c.confirmedSeverity ?? "data untrusted"}
                   </span>
-                  <span className="ml-auto text-xs" style={{ color: "var(--text-3)" }}>
+                  <span className="ml-auto text-[13px]" style={{ color: "#CBD5E1" }}>
                     {isOpen ? "hide" : "why?"}
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="px-3 pb-3 text-xs space-y-1" style={{ color: "var(--text-2)" }}>
+                  <div className="px-3 pb-3 text-xs space-y-1" style={{ color: "#E2E8F0" }}>
                     <p>Raw signal score: {c.rawOverall}</p>
                     <p>AI assessment: {c.aiAssessment}</p>
                     {c.reasoning && <p>Reasoning: {c.reasoning}</p>}

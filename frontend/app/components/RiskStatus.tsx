@@ -22,13 +22,13 @@ export default function RiskStatus({
 
   return (
     <div className="rounded-lg border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <p className="font-mono text-xs uppercase tracking-[0.2em] mb-6" style={{ color: "var(--text-3)" }}>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] mb-6" style={{ color: "#CBD5E1" }}>
         Vault Status
       </p>
 
       <div className="flex items-end justify-between mb-8">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.15em] mb-2" style={{ color: "var(--text-3)" }}>
+          <p className="font-mono text-xs uppercase tracking-[0.15em] mb-2" style={{ color: "#CBD5E1" }}>
             Collateral Price
           </p>
           <p className="font-mono text-3xl" style={{ color: "var(--text-1)" }}>
@@ -36,7 +36,7 @@ export default function RiskStatus({
           </p>
         </div>
         <div className="text-right">
-          <p className="font-mono text-xs uppercase tracking-[0.15em] mb-2" style={{ color: "var(--text-3)" }}>
+          <p className="font-mono text-xs uppercase tracking-[0.15em] mb-2" style={{ color: "#CBD5E1" }}>
             Verdict
           </p>
           <p className="font-mono text-xl font-semibold" style={{ color: statusColor }}>
@@ -50,7 +50,7 @@ export default function RiskStatus({
         style={{ background: "var(--border)" }}
       />
 
-      <p className="text-sm" style={{ color: "var(--text-2)" }}>
+      <p className="text-sm" style={{ color: "#E2E8F0" }}>
         {status === "FROZEN" &&
           "Withdrawals are disabled. The AI oracle flagged a critical risk score against the collateral price feed. The vault owner can override this manually."}
         {status === "SAFE" && "Collateral price is within normal bounds. Deposits and withdrawals are open."}

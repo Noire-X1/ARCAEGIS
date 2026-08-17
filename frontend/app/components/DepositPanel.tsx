@@ -29,7 +29,7 @@ export default function DepositPanel({
 
   return (
     <div className="rounded-lg border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <p className="font-mono text-xs uppercase tracking-[0.2em] mb-6" style={{ color: "var(--text-3)" }}>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] mb-6" style={{ color: "#CBD5E1" }}>
         Deposit / Withdraw
       </p>
 
@@ -46,17 +46,17 @@ export default function DepositPanel({
       ) : (
         <div className="space-y-4">
           <div className="flex justify-between text-sm font-mono">
-            <span style={{ color: "var(--text-3)" }}>Wallet</span>
+            <span style={{ color: "#CBD5E1" }}>Wallet</span>
             <span style={{ color: "var(--text-1)" }}>
               {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "—"}
             </span>
           </div>
           <div className="flex justify-between text-sm font-mono">
-            <span style={{ color: "var(--text-3)" }}>mGOLD balance</span>
+            <span style={{ color: "#CBD5E1" }}>mGOLD balance</span>
             <span style={{ color: "var(--text-1)" }}>{goldBalance ?? "—"}</span>
           </div>
           <div className="flex justify-between text-sm font-mono mb-2">
-            <span style={{ color: "var(--text-3)" }}>Deposited in vault</span>
+            <span style={{ color: "#CBD5E1" }}>Deposited in vault</span>
             <span style={{ color: "var(--text-1)" }}>{vaultBalance ?? "—"}</span>
           </div>
 
@@ -103,7 +103,7 @@ export default function DepositPanel({
             </p>
           )}
           {!configured && (
-            <p className="text-xs font-mono" style={{ color: "var(--text-3)" }}>
+            <p className="text-xs font-mono" style={{ color: "#CBD5E1" }}>
               Vault contract not deployed yet. Actions are disabled until addresses are configured.
             </p>
           )}

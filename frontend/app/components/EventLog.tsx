@@ -27,18 +27,18 @@ export default function EventLog({ events, configured }: { events: VaultEvent[];
             className="w-2 h-2 rounded-full pulse-dot"
             style={{ background: configured ? "var(--accent)" : "var(--text-3)" }}
           />
-          <span className="font-mono text-xs uppercase tracking-[0.2em]" style={{ color: "var(--text-3)" }}>
+          <span className="font-mono text-xs uppercase tracking-[0.2em]" style={{ color: "#CBD5E1" }}>
             Onchain Event Log
           </span>
         </div>
-        <span className="font-mono text-xs" style={{ color: "var(--text-3)" }}>
+        <span className="font-mono text-xs" style={{ color: "#CBD5E1" }}>
           {configured ? "live" : "awaiting deployment"}
         </span>
       </div>
 
       <div className="h-80 overflow-y-auto px-5 py-4 font-mono text-sm">
         {events.length === 0 && (
-          <p style={{ color: "var(--text-3)" }}>
+          <p style={{ color: "#CBD5E1" }}>
             {configured
               ? "Listening for onchain activity. Nothing has happened yet."
               : "Vault contract address is not configured. This log will populate the moment it is deployed and the address is set."}
@@ -47,9 +47,9 @@ export default function EventLog({ events, configured }: { events: VaultEvent[];
         <ul className="space-y-2">
           {events.map((e) => (
             <li key={e.id} className="rise-in flex gap-3 items-baseline">
-              <span style={{ color: "var(--text-3)" }}>{timeLabel(e.timestamp)}</span>
+              <span style={{ color: "#CBD5E1" }}>{timeLabel(e.timestamp)}</span>
               <span style={{ color: KIND_COLOR[e.kind] }}>{e.kind}</span>
-              <span style={{ color: "var(--text-2)" }}>{e.detail}</span>
+              <span style={{ color: "#E2E8F0" }}>{e.detail}</span>
             </li>
           ))}
         </ul>
