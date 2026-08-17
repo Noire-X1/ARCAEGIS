@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-c6a0142b23fa1ea143b39e6fc265124a2d4f329e",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.12.0"
+  },
+  "userSourceNameMap": {
+    "contracts/MockOracle.sol": "project/contracts/MockOracle.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/MockOracle.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.28;\r\n\r\ncontract MockOracle {\r\n    address public owner;\r\n    uint256 public price;\r\n\r\n    event PriceUpdated(uint256 newPrice);\r\n\r\n    constructor(uint256 initialPrice) {\r\n        owner = msg.sender;\r\n        price = initialPrice;\r\n    }\r\n\r\n    function setPrice(uint256 newPrice) external {\r\n        require(msg.sender == owner, \"Not authorized\");\r\n        price = newPrice;\r\n        emit PriceUpdated(newPrice);\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

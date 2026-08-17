@@ -1,0 +1,1 @@
+const fs = require("fs"); const scenarios = require("./scenarios"); const name = process.argv[2]; if (!scenarios[name]) { console.log("Usage: node applyScenario.js calm | crash | staleOracle"); process.exit(1); } fs.writeFileSync("./signals.json", JSON.stringify(scenarios[name], null, 2)); console.log(`Applied scenario: ${name}`);

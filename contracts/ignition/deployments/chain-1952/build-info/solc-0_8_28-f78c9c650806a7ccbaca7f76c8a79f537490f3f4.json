@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-f78c9c650806a7ccbaca7f76c8a79f537490f3f4",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.12.0"
+  },
+  "userSourceNameMap": {
+    "contracts/Vault.sol": "project/contracts/Vault.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Vault.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.28;\r\n\r\ninterface IERC20 {\r\n    function transferFrom(address from, address to, uint256 amount) external returns (bool);\r\n    function transfer(address to, uint256 amount) external returns (bool);\r\n}\r\n\r\ncontract Vault {\r\n    enum State { ACTIVE, RESTRICTED, FROZEN }\r\n    State public state;\r\n    address public policyEngine;\r\n    IERC20 public goldToken;\r\n    mapping(address => uint256) public balances;\r\n\r\n    event Deposited(address indexed user, uint256 amount);\r\n    event Withdrawn(address indexed user, uint256 amount);\r\n    event Restricted();\r\n    event Frozen();\r\n    event Recovered();\r\n\r\n    modifier onlyPolicyEngine() {\r\n        require(msg.sender == policyEngine, \"Not authorized\");\r\n        _;\r\n    }\r\n\r\n    constructor(address _goldToken) {\r\n        policyEngine = msg.sender;\r\n        state = State.ACTIVE;\r\n        goldToken = IERC20(_goldToken);\r\n    }\r\n\r\n    // was payable/no-args before — now pulls ERC20 gold tokens via\r\n    // transferFrom, which requires the user to have called\r\n    // goldToken.approve(vaultAddress, amount) first\r\n    function deposit(uint256 amount) external {\r\n        require(state != State.FROZEN, \"Vault is frozen\");\r\n        require(goldToken.transferFrom(msg.sender, address(this), amount), \"Transfer failed\");\r\n        balances[msg.sender] += amount;\r\n        emit Deposited(msg.sender, amount);\r\n    }\r\n\r\n    function withdraw(uint256 amount) external {\r\n        require(state == State.ACTIVE, \"Withdrawals not allowed in current state\");\r\n        require(balances[msg.sender] >= amount, \"Insufficient balance\");\r\n        balances[msg.sender] -= amount;\r\n        require(goldToken.transfer(msg.sender, amount), \"Transfer failed\");\r\n        emit Withdrawn(msg.sender, amount);\r\n    }\r\n\r\n    // unchanged from before — this is the logic already proven onchain\r\n    function restrict() external onlyPolicyEngine {\r\n        state = State.RESTRICTED;\r\n        emit Restricted();\r\n    }\r\n\r\n    function freeze() external onlyPolicyEngine {\r\n        state = State.FROZEN;\r\n        emit Frozen();\r\n    }\r\n\r\n    function recover() external onlyPolicyEngine {\r\n        state = State.ACTIVE;\r\n        emit Recovered();\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-b009b2d51a7d4a494b899b925189996c9a0a3a9e",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.12.0"
+  },
+  "userSourceNameMap": {
+    "contracts/Vault.sol": "project/contracts/Vault.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Vault.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\r\npragma solidity ^0.8.28; contract Vault { enum State { ACTIVE, RESTRICTED, FROZEN } State public state; address public policyEngine; mapping(address => uint256) public balances; event Deposited(address indexed user, uint256 amount); event Withdrawn(address indexed user, uint256 amount); event Restricted(); event Frozen(); event Recovered(); modifier onlyPolicyEngine() { require(msg.sender == policyEngine, \"Not authorized\"); _; } constructor() { policyEngine = msg.sender; state = State.ACTIVE; } function deposit() external payable { require(state != State.FROZEN, \"Vault is frozen\"); balances[msg.sender] += msg.value; emit Deposited(msg.sender, msg.value); } function withdraw(uint256 amount) external { require(state == State.ACTIVE, \"Withdrawals not allowed in current state\"); require(balances[msg.sender] >= amount, \"Insufficient balance\"); balances[msg.sender] -= amount; payable(msg.sender).transfer(amount); emit Withdrawn(msg.sender, amount); } function restrict() external onlyPolicyEngine { state = State.RESTRICTED; emit Restricted(); } function freeze() external onlyPolicyEngine { state = State.FROZEN; emit Frozen(); } function recover() external onlyPolicyEngine { state = State.ACTIVE; emit Recovered(); } }"
+      }
+    }
+  }
+}
