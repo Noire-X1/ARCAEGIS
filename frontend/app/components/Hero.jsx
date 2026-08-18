@@ -138,6 +138,36 @@ export default function Hero({ logoSrc = "/arcaegis-logo.png" }) {
         applyState(STATE_KEYS[stateIdx]);
       }, 4200);
 
+      // Real vault state polling — overrides decorative cycling once chain responds
+      const VAULT_ADDRESS = "0xe4a540b45e734216c6Ce1b9E5CA61a9AAfdBA31e";
+      const STATE_MAP = { 0: "ACTIVE", 1: "RESTRICTED", 2: "FROZEN" };
+      let realStateKnown = false;
+      let vaultPollInterval;
+
+      async function pollVaultState() {
+        try {
+          const { ethers } = await import("ethers");
+          const provider = new ethers.JsonRpcProvider("https://testrpc.xlayer.tech/terigon");
+          const vault = new ethers.Contract(
+            VAULT_ADDRESS,
+            ["function state() view returns (uint8)"],
+            provider
+          );
+          const stateNum = await vault.state();
+          const key = STATE_MAP[Number(stateNum)] ?? "ACTIVE";
+          if (!realStateKnown) {
+            clearInterval(stateInterval);
+            realStateKnown = true;
+          }
+          if (!disposed) applyState(key);
+        } catch {
+          // ignore transient RPC errors, keep current display
+        }
+      }
+
+      pollVaultState();
+      vaultPollInterval = setInterval(pollVaultState, 8000);
+
       function onMouseMove(e) {
         mouseX = e.clientX / window.innerWidth - 0.5;
         mouseY = e.clientY / window.innerHeight - 0.5;
@@ -190,6 +220,7 @@ export default function Hero({ logoSrc = "/arcaegis-logo.png" }) {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("resize", onResize);
         clearInterval(stateInterval);
+        clearInterval(vaultPollInterval);
         cancelAnimationFrame(animationId);
         coreGeo.dispose(); coreMat.dispose();
         shellGeo.dispose(); shellMat.dispose();
