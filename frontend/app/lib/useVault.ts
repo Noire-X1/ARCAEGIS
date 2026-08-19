@@ -260,11 +260,27 @@ export function useVault(): VaultState {
       return;
     }
     try {
-      const signer = await signerProviderRef.current.getSigner();
-      const vault = new Contract(CONTRACTS.vault, VAULT_ABI, signer);
+      const okxProvider = typeof window !== "undefined"
+        ? (window.okxwallet ?? window.ethereum)
+        : undefined;
+      if (!okxProvider) throw new Error("No wallet provider found");
+
       const value = parseUnitsSafe(amount, 18);
-      const tx = await vault.withdraw(value);
-      await tx.wait();
+      const readProvider = readProviderRef.current;
+      if (!readProvider) throw new Error("No read provider");
+
+      const withdrawTx = await okxProvider.request({
+        method: "eth_sendTransaction",
+        params: [{
+          from: address,
+          to: CONTRACTS.vault,
+          data: new ethers.Interface([
+            "function withdraw(uint256 amount)"
+          ]).encodeFunctionData("withdraw", [value]),
+          gas: "0x249F0",
+        }],
+      });
+      await readProvider.waitForTransaction(withdrawTx);
       await refreshBalances(address);
       setError(null);
     } catch (err: any) {
