@@ -29,9 +29,15 @@ type VaultState = {
 
 declare global {
   interface Window {
-    ethereum?: unknown;
-    okxwallet?: unknown;
+    ethereum?: EIP1193Provider;
+    okxwallet?: EIP1193Provider;
   }
+}
+
+interface EIP1193Provider {
+  request(args: { method: string; params?: any[] }): Promise<any>;
+  on?(event: string, handler: (...args: any[]) => void): void;
+  removeListener?(event: string, handler: (...args: any[]) => void): void;
 }
 
 export function useVault(): VaultState {
