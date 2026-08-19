@@ -94,7 +94,7 @@ export function useVault(): VaultState {
     async function pollEvents() {
       try {
         const currentBlock = await provider.getBlockNumber();
-        const fromBlock = lastScannedBlockRef.current ?? currentBlock;
+        const fromBlock = lastScannedBlockRef.current ?? Math.max(0, currentBlock - 100);
         if (currentBlock < fromBlock) return;
 
         const [deposits, withdrawals, restricts, freezes, recovers] = await Promise.all([
