@@ -261,6 +261,7 @@ export function useVault(): VaultState {
         }],
       });
       await readProvider.waitForTransaction(depositTx);
+      pushEvent({ kind: "Deposited", detail: `${amount} mGOLD from ${short(address)}` });
       await refreshBalances(address);
       setError(null);
     } catch (err: any) {
@@ -300,6 +301,7 @@ export function useVault(): VaultState {
         }],
       });
       await readProvider.waitForTransaction(withdrawTx);
+      pushEvent({ kind: "Withdrawn", detail: `${amount} mGOLD to ${short(address)}` });
       await refreshBalances(address);
       setError(null);
     } catch (err: any) {
