@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BrowserProvider, Contract, JsonRpcProvider, formatUnits } from "ethers";
+import { BrowserProvider, Contract, JsonRpcProvider, ethers, formatUnits } from "ethers";
 import { CONTRACTS, X_LAYER_TESTNET, contractsConfigured } from "./chain";
 import { MOCK_GOLD_ABI, MOCK_ORACLE_ABI, VAULT_ABI } from "./abi";
 
@@ -192,27 +192,50 @@ export function useVault(): VaultState {
       return;
     }
     try {
-      console.log("deposit: getting signer");
-      const signer = await signerProviderRef.current.getSigner();
-      console.log("deposit: got signer, checking allowance");
-      const readProvider = readProviderRef.current ?? signerProviderRef.current;
-      const goldRead = new Contract(CONTRACTS.mockGold, MOCK_GOLD_ABI, readProvider);
-      const gold = new Contract(CONTRACTS.mockGold, MOCK_GOLD_ABI, signer);
-      const vault = new Contract(CONTRACTS.vault, VAULT_ABI, signer);
-      const decimals = await goldRead.decimals();
+      const okxProvider = typeof window !== "undefined"
+        ? (window.okxwallet ?? window.ethereum)
+        : undefined;
+      if (!okxProvider) throw new Error("No wallet provider found");
+
+      const decimals = 18;
       const value = parseUnitsSafe(amount, decimals);
+
+      // Check allowance using read provider
+      const readProvider = readProviderRef.current;
+      if (!readProvider) throw new Error("No read provider");
+      const goldRead = new Contract(CONTRACTS.mockGold, MOCK_GOLD_ABI, readProvider);
       const allowance = await goldRead.allowance(address, CONTRACTS.vault);
-      console.log("deposit: allowance check", { allowance: allowance.toString(), value: value.toString() });
+
+      // If allowance insufficient, send approve via native OKX provider request
       if (allowance < value) {
-        console.log("deposit: sending approve tx");
-        const approveTx = await gold.approve(CONTRACTS.vault, value, { gasLimit: 100000 });
-        await approveTx.wait();
-        console.log("deposit: approve confirmed");
+        const approveTx = await okxProvider.request({
+          method: "eth_sendTransaction",
+          params: [{
+            from: address,
+            to: CONTRACTS.mockGold,
+            data: new ethers.Interface([
+              "function approve(address spender, uint256 amount) returns (bool)"
+            ]).encodeFunctionData("approve", [CONTRACTS.vault, value]),
+            gas: "0x186A0",
+          }],
+        });
+        // Wait for approve to confirm
+        await readProvider.waitForTransaction(approveTx);
       }
-      console.log("deposit: sending deposit tx");
-      const tx = await vault.deposit(value, { gasLimit: 150000 });
-      await tx.wait();
-      console.log("deposit: deposit confirmed");
+
+      // Send deposit via native OKX provider request
+      const depositTx = await okxProvider.request({
+        method: "eth_sendTransaction",
+        params: [{
+          from: address,
+          to: CONTRACTS.vault,
+          data: new ethers.Interface([
+            "function deposit(uint256 amount)"
+          ]).encodeFunctionData("deposit", [value]),
+          gas: "0x249F0",
+        }],
+      });
+      await readProvider.waitForTransaction(depositTx);
       await refreshBalances(address);
       setError(null);
     } catch (err: any) {
