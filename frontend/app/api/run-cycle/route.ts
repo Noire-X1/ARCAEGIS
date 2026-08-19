@@ -5,6 +5,6 @@ export const runtime = "nodejs";
 export async function POST() {
   return NextResponse.json({
    ok: false,
-   error: "Run Cycle is only available when running locally. For the live demo, run node loop.js from arcaegis-agent directly."
+   error: "Agent execution requires a local environment. Deploy your own instance to enable live cycle triggering."
   }, { status: 503 });
 }
