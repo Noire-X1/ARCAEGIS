@@ -94,33 +94,52 @@ export function useVault(): VaultState {
     async function pollEvents() {
       try {
         const currentBlock = await provider.getBlockNumber();
-        const fromBlock = lastScannedBlockRef.current ?? Math.max(0, currentBlock - 100);
+        const fromBlock = lastScannedBlockRef.current
+          ? lastScannedBlockRef.current
+          : Math.max(0, currentBlock - 500);
+
         if (currentBlock < fromBlock) return;
 
-        const [deposits, withdrawals, restricts, freezes, recovers] = await Promise.all([
-          vault.queryFilter(vault.filters.Deposited(), fromBlock, currentBlock),
-          vault.queryFilter(vault.filters.Withdrawn(), fromBlock, currentBlock),
-          vault.queryFilter(vault.filters.Restricted(), fromBlock, currentBlock),
-          vault.queryFilter(vault.filters.Frozen(), fromBlock, currentBlock),
-          vault.queryFilter(vault.filters.Recovered(), fromBlock, currentBlock),
-        ]);
+        const logs = await provider.getLogs({
+          address: CONTRACTS.vault,
+          fromBlock,
+          toBlock: currentBlock,
+        });
+
         if (cancelled) return;
 
-        for (const ev of deposits) {
-          const args = (ev as any).args;
-          pushEvent({ kind: "Deposited", detail: `${formatUnits(args[1], 18)} mGOLD from ${short(args[0])}` });
+        const iface = vault.interface;
+
+        for (const log of logs) {
+          try {
+            const parsed = iface.parseLog(log);
+            if (!parsed) continue;
+
+            if (parsed.name === "Deposited") {
+              pushEvent({
+                kind: "Deposited",
+                detail: `${formatUnits(parsed.args[1], 18)} mGOLD from ${short(parsed.args[0])}`,
+              });
+            } else if (parsed.name === "Withdrawn") {
+              pushEvent({
+                kind: "Withdrawn",
+                detail: `${formatUnits(parsed.args[1], 18)} mGOLD to ${short(parsed.args[0])}`,
+              });
+            } else if (parsed.name === "Restricted") {
+              pushEvent({ kind: "Restricted", detail: "vault restricted by policy engine" });
+            } else if (parsed.name === "Frozen") {
+              pushEvent({ kind: "Frozen", detail: "vault frozen by policy engine" });
+            } else if (parsed.name === "Recovered") {
+              pushEvent({ kind: "Recovered", detail: "vault recovered by policy engine" });
+            }
+          } catch {
+            // skip unparseable logs
+          }
         }
-        for (const ev of withdrawals) {
-          const args = (ev as any).args;
-          pushEvent({ kind: "Withdrawn", detail: `${formatUnits(args[1], 18)} mGOLD to ${short(args[0])}` });
-        }
-        for (const _ of restricts) pushEvent({ kind: "Restricted", detail: "vault restricted by policy engine" });
-        for (const _ of freezes) pushEvent({ kind: "Frozen", detail: "vault frozen by policy engine" });
-        for (const _ of recovers) pushEvent({ kind: "Recovered", detail: "vault recovered by policy engine" });
 
         lastScannedBlockRef.current = currentBlock + 1;
       } catch {
-        // ignore transient polling errors, next interval will retry
+        // ignore transient RPC errors
       }
     }
 
